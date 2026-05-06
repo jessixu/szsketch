@@ -1,18 +1,18 @@
 module.exports = {
   apps: [
     {
-      name: "szsketch",
-      script: "node_modules/.bin/next",
-      args: "start -p 3000",
-      cwd: "/var/www/szsketch",
+      name: "aiprint-web",
+      script: ".next/standalone/server.js",
+      cwd: "/www/wwwroot/aiprint.hichara.com",
       env: {
         NODE_ENV: "production",
+        HOSTNAME: "127.0.0.1",
         PORT: 3000,
       },
       instances: 1,
       max_memory_restart: "512M",
-      error_file: "/var/log/szsketch/error.log",
-      out_file: "/var/log/szsketch/out.log",
+      error_file: "/www/wwwroot/aiprint.hichara.com/logs/pm2-error.log",
+      out_file: "/www/wwwroot/aiprint.hichara.com/logs/pm2-out.log",
       merge_logs: true,
       log_date_format: "YYYY-MM-DD HH:mm:ss",
     },
