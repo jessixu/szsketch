@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique @db.VarChar(50)
+  displayName  String   @map("display_name") @db.VarChar(50)
+  passwordHash String   @map("password_hash")
+  className    String?  @map("class_name") @db.VarChar(50)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  history      History[]
+
+  @@map("users")
+}
+
+model History {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  origin      String   @db.VarChar(100)
+  mood        String   @db.VarChar(50)
+  patterns    String   @default("[]") @db.VarChar(500)
+  notes       String   @db.Text
+  prompt      String   @db.Text
+  imageUrl    String?  @map("image_url") @db.VarChar(500)
+  description String?  @db.Text
+  aiAvailable Boolean  @default(false) @map("ai_available")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("history")
+}
