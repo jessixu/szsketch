@@ -1,12 +1,22 @@
 {
   "name": "szsketch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "prisma generate",
     "build": "next build",
+    "postbuild": "node ./scripts/prepare-standalone.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "start:standalone": "node .next/standalone/server.js",
+    "lint": "eslint",
+    "release:start": "bash ./scripts/release/git-flow.sh start-release",
+    "release:verify": "npm run test:deploy-readiness && npm run lint && npm run build",
+    "release:finish": "bash ./scripts/release/git-flow.sh finish-release",
+    "hotfix:start": "bash ./scripts/release/git-flow.sh start-hotfix",
+    "hotfix:finish": "bash ./scripts/release/git-flow.sh finish-hotfix",
+    "deploy:prod": "bash ./deploy.sh",
+    "test:deploy-readiness": "node ./scripts/test-deploy-readiness.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

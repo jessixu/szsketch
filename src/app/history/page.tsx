@@ -18,7 +18,6 @@ export default function HistoryPage() {
   const [selected, setSelected] = useState<HistoryItem | null>(null);
 
   useEffect(() => {
-    setLoading(true);
     api
       .history(page)
       .then((data) => {
@@ -146,7 +145,10 @@ export default function HistoryPage() {
             <Button
               variant="outline"
               disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
+              onClick={() => {
+                setLoading(true);
+                setPage(page - 1);
+              }}
             >
               上一页
             </Button>
@@ -156,7 +158,10 @@ export default function HistoryPage() {
             <Button
               variant="outline"
               disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
+              onClick={() => {
+                setLoading(true);
+                setPage(page + 1);
+              }}
             >
               下一页
             </Button>
