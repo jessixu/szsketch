@@ -497,11 +497,8 @@ function BeastResultImage({ title, image }: { title: string; image: { label: str
   return (
     <div className="rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
       <h3 className="mb-3 text-center font-heading text-2xl font-bold text-[#6f4b28]">{title}</h3>
-      <div className="relative overflow-hidden rounded-xl border border-stone-800 bg-[#111] p-3">
-        <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
-        <div className="relative flex max-h-[520px] items-center justify-center overflow-hidden rounded-lg bg-[#191510] p-2">
-          <img src={image.url} alt={title} className="max-h-[480px] w-auto max-w-full object-contain" />
-        </div>
+      <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[#f6ecdc] p-2">
+        <img src={image.url} alt={title} className="max-h-[480px] w-auto max-w-full rounded-lg object-contain" />
       </div>
       <a
         href={image.url}
@@ -813,11 +810,8 @@ function ResultPanel({
                   {result.courseKey === "shanhaijing" ? "AI 生成版画" : image.label}
                 </h3>
                 {result.courseKey === "shanhaijing" ? (
-                  <div className="relative overflow-hidden rounded-xl border border-stone-800 bg-[#111] p-3">
-                    <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
-                    <div className="relative flex max-h-[520px] items-center justify-center overflow-hidden rounded-lg bg-[#191510] p-2">
-                      <img src={image.url} alt={image.label} className="max-h-[480px] w-auto max-w-full object-contain" />
-                    </div>
+                  <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[#f6ecdc] p-2">
+                    <img src={image.url} alt={image.label} className="max-h-[480px] w-auto max-w-full rounded-lg object-contain" />
                   </div>
                 ) : (
                   <div className="flex max-h-[560px] items-center justify-center overflow-hidden rounded-lg bg-white p-2">
