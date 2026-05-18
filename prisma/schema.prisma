@@ -29,9 +29,13 @@ model History {
   patterns    String   @default("[]") @db.VarChar(500)
   notes       String   @db.Text
   prompt      String   @db.Text
-  imageUrl    String?  @map("image_url") @db.VarChar(500)
+  imageUrl    String?  @map("image_url") @db.Text
   description String?  @db.Text
   aiAvailable Boolean  @default(false) @map("ai_available")
+  courseKey   String   @default("shanhaijing") @map("course_key") @db.VarChar(50)
+  actionKey   String   @default("generate") @map("action_key") @db.VarChar(50)
+  paramsJson  String?  @map("params_json") @db.Text
+  outputImages String? @map("output_images") @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

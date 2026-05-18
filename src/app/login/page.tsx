@@ -1,26 +1,26 @@
-"use client";
+import BrandMark from "@/components/BrandMark";
+import { loginAction } from "./actions";
 
-import { useActionState } from "react";
-import { loginAction, type LoginState } from "./actions";
-
-const initialState: LoginState = {};
-
-export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(loginAction, initialState);
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#fbf6ee] p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl border-2 border-[#8a6a43] bg-[#efe3d0] text-lg font-bold text-[#8a6a43] shadow-sm">
-            版画
+          <div className="mb-4 flex justify-center">
+            <BrandMark size="lg" />
           </div>
-          <h1 className="text-2xl font-bold text-stone-900">深中高中园版画素材助手</h1>
-          <p className="mt-1 text-stone-500">请登录以使用版画设计工具</p>
+          <h1 className="text-2xl font-bold text-stone-900">印刻奇旅 · 版画创意智造工坊</h1>
+          <p className="mt-1 text-stone-500">请登录以开启版画创意工坊</p>
         </div>
 
         <form
-          action={formAction}
+          action={loginAction}
           className="rounded-2xl border border-[#eadcc8] bg-white p-8 shadow-sm"
         >
           <div className="space-y-4">
@@ -48,18 +48,17 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {state.error && (
+          {error && (
             <div className="mt-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600">
-              {state.error}
+              {error}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={pending}
             className="mt-6 h-12 w-full rounded-xl bg-[#27221c] text-lg font-medium text-[#f6e2b8] hover:bg-[#3b3025] disabled:opacity-50"
           >
-            {pending ? "登录中…" : "登 录"}
+            登 录
           </button>
         </form>
 

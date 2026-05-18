@@ -95,6 +95,9 @@ tar \
   --exclude='.env.local' \
   --exclude='.env.production' \
   --exclude='deploy.env.local' \
+  --exclude='animal_describe.xlsx' \
+  --exclude='animal_img' \
+  --exclude='*.bak' \
   --exclude='test-results' \
   --exclude='playwright-report' \
   --exclude='.DS_Store' \

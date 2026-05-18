@@ -5,6 +5,7 @@ interface GenerateResultPanelProps {
   origin: string;
   mood: string;
   imageUrl: string | null;
+  imageError: string | null;
   description: string | null;
   aiAvailable: boolean;
 }
@@ -26,6 +27,7 @@ export default function GenerateResultPanel({
   origin,
   mood,
   imageUrl,
+  imageError,
   description,
   aiAvailable,
 }: GenerateResultPanelProps) {
@@ -37,6 +39,12 @@ export default function GenerateResultPanel({
         {!aiAvailable && !imageUrl && (
           <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-amber-700">
             AI生成功能即将开放，当前显示预览效果
+          </div>
+        )}
+
+        {aiAvailable && imageError && !imageUrl && (
+          <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center text-amber-700">
+            {imageError}
           </div>
         )}
 

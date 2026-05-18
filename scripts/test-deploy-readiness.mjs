@@ -8,6 +8,7 @@ const nextConfig = readFile("next.config.ts");
 const deployScript = readFile("deploy.sh");
 const ecosystemConfig = readFile("ecosystem.config.js");
 const gitignore = readFile(".gitignore");
+const proxy = readFile("src/proxy.ts");
 
 assert.equal(packageJson.scripts["deploy:prod"], "bash ./deploy.sh", "package.json 必须提供 deploy:prod");
 assert.equal(packageJson.scripts["release:start"], "bash ./scripts/release/git-flow.sh start-release", "package.json 必须提供 release:start");
@@ -20,5 +21,6 @@ assert.match(deployScript, /npm run build/, "deploy.sh 必须执行生产构建"
 assert.match(deployScript, /pm2 reload ecosystem\.config\.js --update-env/, "deploy.sh 必须通过 PM2 reload 发布");
 assert.match(ecosystemConfig, /aiprint-web/, "ecosystem.config.js 必须声明 aiprint-web");
 assert.match(gitignore, /^deploy\.env\.local$/m, ".gitignore 必须忽略 deploy.env.local");
+assert.match(proxy, /pathname\.startsWith\("\/api\/health"\)/, "proxy 必须放行 /api/health 健康检查");
 
 console.log("deploy readiness tests passed");

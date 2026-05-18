@@ -23,10 +23,23 @@ export const api = {
   me: () => request<{ id: string; username: string; displayName: string }>("/api/auth/me"),
 
   generate: (origin: string, mood: string, notes?: string) =>
-    request<{ id: string; imageUrl: string | null; prompt: string; description: string; aiAvailable: boolean }>(
+    request<{
+      id: string;
+      imageUrl: string | null;
+      prompt: string;
+      description: string;
+      aiAvailable: boolean;
+      imageError: string | null;
+    }>(
       "/api/generate",
       { method: "POST", body: JSON.stringify({ origin, mood, notes }) }
     ),
+
+  courseGenerate: (payload: CourseGeneratePayload) =>
+    request<CourseGenerateResponse>("/api/course-generate", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 
   history: (page = 1, limit = 20) =>
     request<{ items: HistoryItem[]; total: number; page: number; limit: number }>(
@@ -46,5 +59,27 @@ export interface HistoryItem {
   imageUrl: string | null;
   description: string | null;
   aiAvailable: boolean;
+  courseKey: string;
+  actionKey: string;
+  paramsJson: string | null;
+  outputImages: string | null;
   createdAt: string;
+}
+
+export interface CourseGeneratePayload {
+  courseKey: "black-white" | "shanhaijing" | "free" | "color";
+  action: string;
+  inputs: Record<string, unknown>;
+}
+
+export interface CourseGenerateResponse {
+  id: string;
+  courseKey: string;
+  action: string;
+  images: Array<{ label: string; url: string }>;
+  description: string;
+  prompt: string;
+  palette: string[] | null;
+  aiAvailable: boolean;
+  imageError: string | null;
 }

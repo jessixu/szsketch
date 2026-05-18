@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BrandMark from "@/components/BrandMark";
 
 const statusTexts = [
   "正在构思版画构图…",
@@ -34,17 +35,10 @@ export default function LoadingOverlay({
         }}
       />
 
-      {/* Content */}
       <div className="relative flex flex-col items-center gap-8">
-        {/* Glow behind stamp */}
         <div className="absolute -inset-16 rounded-full bg-[#8b1a1a]/20 blur-3xl" />
 
-        {/* Stamp animation */}
-        <div className="stamp-animate relative">
-          <div className="flex h-28 w-28 items-center justify-center rounded-md border-4 border-[#f7efe1] bg-[#8b1a1a] shadow-2xl shadow-[#8b1a1a]/30">
-            <span className="text-2xl font-bold text-[#f7efe1]">版画</span>
-          </div>
-        </div>
+        <BrandMark size="lg" animated />
 
         {/* Status text */}
         <p className="text-lg font-medium text-[#f7efe1]/90">{statusTexts[statusIndex]}</p>
@@ -71,15 +65,11 @@ export default function LoadingOverlay({
       </div>
 
       <style jsx>{`
-        .stamp-animate {
-          animation: stamp 1.6s ease-in-out infinite;
-        }
-        @keyframes stamp {
-          0% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
-          30% { transform: translateY(0) scale(1); opacity: 1; }
-          50% { transform: translateY(0) scale(1); opacity: 1; }
-          80% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
-          100% { transform: translateY(-20px) scale(1.05); opacity: 0.8; }
+        @media (prefers-reduced-motion: reduce) {
+          :global(.animate-spin),
+          :global(.animate-pulse) {
+            animation: none;
+          }
         }
       `}</style>
     </div>

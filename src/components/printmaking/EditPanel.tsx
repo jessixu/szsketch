@@ -11,6 +11,13 @@ interface EditPanelProps {
 }
 
 export default function EditPanel({ notes, onNotesChange, onRegenerate, loading }: EditPanelProps) {
+  const handleQuickEdit = (item: string) => {
+    const addition = `调整${item}`;
+    if (notes.includes(addition)) return;
+    const next = notes.trim() ? `${notes.trim()}；${addition}` : addition;
+    onNotesChange(next.slice(0, 200));
+  };
+
   return (
     <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
       <CardContent className="p-5">
@@ -18,7 +25,12 @@ export default function EditPanel({ notes, onNotesChange, onRegenerate, loading 
         <p className="mt-1 text-stone-500">对生成结果进行调整与优化</p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           {edits.map((item) => (
-            <button key={item} className="rounded-lg bg-[#f3eadf] px-3 py-2 text-sm font-medium text-stone-700 hover:bg-[#ead8c2]">
+            <button
+              key={item}
+              type="button"
+              onClick={() => handleQuickEdit(item)}
+              className="rounded-lg bg-[#f3eadf] px-3 py-2 text-sm font-medium text-stone-700 hover:bg-[#ead8c2]"
+            >
               {item}
             </button>
           ))}

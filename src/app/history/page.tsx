@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { api, type HistoryItem } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import BrandMark from "@/components/BrandMark";
 import TextureBox from "@/components/printmaking/TextureBox";
 import PrintSVG from "@/components/printmaking/PrintSVG";
 import { getMainType } from "@/data/moods";
+import { getCourseTitle } from "@/lib/courseConfig";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -36,9 +38,7 @@ export default function HistoryPage() {
         {/* Header */}
         <header className="flex items-center justify-between">
           <div className="flex gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl border-2 border-[#8a6a43] bg-[#efe3d0] text-sm font-bold text-[#8a6a43] shadow-sm">
-              版画
-            </div>
+            <BrandMark size="md" />
             <div>
               <h1 className="text-3xl font-bold tracking-tight">生成记录</h1>
               <p className="mt-1 text-lg text-stone-600">共 {total} 条记录</p>
@@ -67,9 +67,13 @@ export default function HistoryPage() {
                 </button>
               </div>
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                {selected.imageUrl ? (
-                  <div className="rounded-xl border border-stone-200 overflow-hidden">
-                    <img src={selected.imageUrl} alt="AI生成版画" className="w-full" />
+                {getHistoryImages(selected).length > 0 ? (
+                  <div className="grid gap-3">
+                    {getHistoryImages(selected).map((image) => (
+                      <div key={`${image.label}-${image.url}`} className="overflow-hidden rounded-xl border border-stone-200">
+                        <img src={image.url} alt={image.label} className="w-full" />
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <TextureBox className="h-64">
@@ -78,6 +82,7 @@ export default function HistoryPage() {
                 )}
                 <div className="space-y-3">
                   <p><b>原形：</b>{selected.origin}</p>
+                  <p><b>课程：</b>{getCourseTitle(selected.courseKey)}</p>
                   <p><b>气质：</b>{selected.mood}</p>
                   <p><b>纹样：</b>{JSON.parse(selected.patterns).join("、")}</p>
                   {selected.notes && <p><b>修改说明：</b>{selected.notes}</p>}
@@ -115,10 +120,10 @@ export default function HistoryPage() {
                 onClick={() => setSelected(item)}
                 className="cursor-pointer rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition hover:shadow-md"
               >
-                {item.imageUrl ? (
+                {getHistoryImages(item)[0] ? (
                   <div className="aspect-square overflow-hidden rounded-lg">
                     <img
-                      src={item.imageUrl}
+                      src={getHistoryImages(item)[0].url}
                       alt={item.origin}
                       className="h-full w-full object-cover"
                     />
@@ -130,6 +135,7 @@ export default function HistoryPage() {
                 )}
                 <div className="mt-2">
                   <p className="font-semibold text-stone-700">{item.origin} · {item.mood}</p>
+                  <p className="text-xs text-[#8a6a43]">{getCourseTitle(item.courseKey)}</p>
                   <p className="text-xs text-stone-400">
                     {new Date(item.createdAt).toLocaleString("zh-CN")}
                   </p>
@@ -170,4 +176,21 @@ export default function HistoryPage() {
       </div>
     </main>
   );
+}
+
+function getHistoryImages(item: HistoryItem) {
+  if (item.outputImages) {
+    try {
+      const parsed = JSON.parse(item.outputImages);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(
+          (image): image is { label: string; url: string } =>
+            image && typeof image.label === "string" && typeof image.url === "string",
+        );
+      }
+    } catch {
+      // Fall back to the legacy single image field.
+    }
+  }
+  return item.imageUrl ? [{ label: "生成图", url: item.imageUrl }] : [];
 }

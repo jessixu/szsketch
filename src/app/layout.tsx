@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "深中高中园版画素材助手",
-  description: "传统纹样与版画设计生成工具",
+  title: "印刻奇旅 · 版画创意智造工坊",
+  description: "版画创意智造与传统纹样生成工具",
 };
 
 export default function RootLayout({
