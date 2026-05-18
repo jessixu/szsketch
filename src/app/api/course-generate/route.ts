@@ -149,7 +149,6 @@ async function generateShanhaijing(action: string, inputs: Record<string, unknow
     SHANHAIJING_STYLE,
     subject,
     `mood: ${mood}, complete printmaking composition, full scene with atmospheric background`,
-    `recommended decorative patterns for reference: ${beast.patterns}`,
     "integrated mountain, cloud, wave or traditional Chinese pattern background, background carved into the same woodblock print",
     "the creature and environment are part of one continuous artwork, no outer border, no picture frame, no blank white margin",
     "suitable for high school woodblock carving practice, clear silhouette, bold black shapes, rough carved texture",
