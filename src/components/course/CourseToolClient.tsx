@@ -481,7 +481,7 @@ function BeastResultCompare({
     <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
       <CardContent className="space-y-5 p-5">
         <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">生成结果</h2>
-        <div className={`grid gap-4 ${revisedImage ? "lg:grid-cols-2" : ""}`}>
+        <div className={`grid gap-4 ${revisedImage ? "lg:grid-cols-2" : "mx-auto w-full max-w-3xl"}`}>
           {initialImage && <BeastResultImage title="初稿" image={initialImage} />}
           {revisedImage && <BeastResultImage title="修改版" image={revisedImage} />}
         </div>
@@ -499,8 +499,8 @@ function BeastResultImage({ title, image }: { title: string; image: { label: str
       <h3 className="mb-3 text-center font-heading text-2xl font-bold text-[#6f4b28]">{title}</h3>
       <div className="relative overflow-hidden rounded-xl border border-stone-800 bg-[#111] p-3">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
-        <div className="relative overflow-hidden rounded-lg bg-[#191510]">
-          <img src={image.url} alt={title} className="h-auto w-full" />
+        <div className="relative flex max-h-[520px] items-center justify-center overflow-hidden rounded-lg bg-[#191510] p-2">
+          <img src={image.url} alt={title} className="max-h-[480px] w-auto max-w-full object-contain" />
         </div>
       </div>
       <a
@@ -559,8 +559,8 @@ function ColorEffectPanel({
   return (
     <section className="rounded-xl border border-[#eadcc8] bg-white p-5">
       <h2 className="text-xl font-bold">套色效果图</h2>
-      <div className="mt-4 overflow-hidden rounded-xl border border-stone-200 bg-[#fffaf2]">
-        <img src={image.url} alt={image.label} className="w-full" />
+      <div className="mx-auto mt-4 flex max-h-[560px] max-w-4xl items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
+        <img src={image.url} alt={image.label} className="max-h-[520px] w-auto max-w-full object-contain" />
       </div>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <PaletteSwatches palette={palette} count={count} compact />
@@ -806,7 +806,7 @@ function ResultPanel({
           </div>
         )}
         {result.images.length > 0 && (
-          <div className={`grid gap-4 ${result.courseKey === "shanhaijing" ? "" : "md:grid-cols-2"}`}>
+          <div className={`grid gap-4 ${result.images.length > 1 ? "md:grid-cols-2" : "mx-auto w-full max-w-4xl"}`}>
             {result.images.map((image) => (
               <div key={image.label} className="rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
                 <h3 className={`mb-3 text-center font-bold text-[#8a6a43] ${result.courseKey === "shanhaijing" ? "text-xl" : ""}`}>
@@ -815,13 +815,13 @@ function ResultPanel({
                 {result.courseKey === "shanhaijing" ? (
                   <div className="relative overflow-hidden rounded-xl border border-stone-800 bg-[#111] p-3">
                     <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
-                    <div className="relative overflow-hidden rounded-lg bg-[#191510]">
-                      <img src={image.url} alt={image.label} className="h-auto w-full" />
+                    <div className="relative flex max-h-[520px] items-center justify-center overflow-hidden rounded-lg bg-[#191510] p-2">
+                      <img src={image.url} alt={image.label} className="max-h-[480px] w-auto max-w-full object-contain" />
                     </div>
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-lg bg-white">
-                    <img src={image.url} alt={image.label} className="w-full" />
+                  <div className="flex max-h-[560px] items-center justify-center overflow-hidden rounded-lg bg-white p-2">
+                    <img src={image.url} alt={image.label} className="max-h-[520px] w-auto max-w-full object-contain" />
                   </div>
                 )}
                 {result.courseKey === "black-white" && (
