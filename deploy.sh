@@ -1,5 +1,5 @@
 #!/bin/bash
-# 正式部署脚本：本地代码同步到阿里云 ECS，然后在远端执行 Prisma + Next.js + PM2 发布
+# 正式部署脚本：本地代码同步到腾讯云服务器，然后在远端执行 Prisma + Next.js + PM2 发布
 
 set -euo pipefail
 
@@ -25,16 +25,15 @@ fi
 
 source "$DEPLOY_ENV"
 
-REMOTE_USER="${REMOTE_USER:-root}"
+REMOTE_USER="${REMOTE_USER:-ubuntu}"
 REMOTE_HOST="${ECS_PUBLIC_IP:-}"
 PROJECT_DIR="${PROJECT_DIR:-$SCRIPT_DIR}"
-REMOTE_PROJECT_DIR="${REMOTE_PROJECT_DIR:-/www/wwwroot/aiprint.hichara.com}"
-REMOTE_ENV_FILE="${REMOTE_ENV_FILE:-${REMOTE_PROJECT_DIR}/.env.production}"
-PM2_APP_NAME="${PM2_APP_NAME:-aiprint-web}"
+REMOTE_PROJECT_DIR="${REMOTE_PROJECT_DIR:-/var/www/szsketch}"
+REMOTE_ENV_FILE="${REMOTE_ENV_FILE:-${REMOTE_PROJECT_DIR}/.env}"
+PM2_APP_NAME="${PM2_APP_NAME:-szsketch}"
 HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://127.0.0.1:3000/api/health}"
 
 required_vars=(
-  "SSH_KEY_PATH"
   "ECS_PUBLIC_IP"
   "PROJECT_DIR"
   "REMOTE_PROJECT_DIR"
@@ -54,14 +53,28 @@ if [ ! -d "$PROJECT_DIR" ]; then
   exit 1
 fi
 
-if [ ! -f "$SSH_KEY_PATH" ]; then
-  log_error "SSH_KEY_PATH 不存在: $SSH_KEY_PATH"
+SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30)
+SSH_CMD=(ssh "${SSH_OPTS[@]}")
+
+if [ -n "${SSH_KEY_PATH:-}" ]; then
+  if [ ! -f "$SSH_KEY_PATH" ]; then
+    log_error "SSH_KEY_PATH 不存在: $SSH_KEY_PATH"
+    exit 1
+  fi
+  chmod 600 "$SSH_KEY_PATH" 2>/dev/null || true
+  SSH_CMD=(ssh "${SSH_OPTS[@]}" -i "$SSH_KEY_PATH")
+elif [ -n "${SSH_PASSWORD:-}" ]; then
+  if ! command -v sshpass >/dev/null 2>&1; then
+    log_error "使用 SSH_PASSWORD 需要先安装 sshpass"
+    exit 1
+  fi
+  export SSHPASS="$SSH_PASSWORD"
+  SSH_CMD=(sshpass -e ssh "${SSH_OPTS[@]}")
+else
+  log_error "请在 deploy.env.local 中配置 SSH_KEY_PATH 或 SSH_PASSWORD"
   exit 1
 fi
 
-chmod 600 "$SSH_KEY_PATH" 2>/dev/null || true
-
-SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -i "$SSH_KEY_PATH")
 REMOTE_TARGET="${REMOTE_USER}@${REMOTE_HOST}"
 
 log_step "检查本地项目状态"
@@ -76,39 +89,31 @@ log_info "本地项目目录: $PROJECT_DIR"
 log_info "目标服务器: $REMOTE_TARGET"
 log_info "目标目录: $REMOTE_PROJECT_DIR"
 
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+  log_error "存在未提交的已跟踪文件变更。请先提交代码再部署，避免线上版本和 git 不一致。"
+  git status --short --untracked-files=no
+  exit 1
+fi
+
 log_step "检查 SSH 连接"
-ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "echo 'SSH 连接成功'" >/dev/null
+"${SSH_CMD[@]}" "$REMOTE_TARGET" "echo 'SSH 连接成功'" >/dev/null
 
 log_step "检查远端运行依赖"
-ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "
+"${SSH_CMD[@]}" "$REMOTE_TARGET" "
   command -v node >/dev/null 2>&1 || { echo '缺少 node'; exit 1; }
   command -v npm >/dev/null 2>&1 || { echo '缺少 npm'; exit 1; }
   command -v pm2 >/dev/null 2>&1 || { echo '缺少 pm2'; exit 1; }
-  [ -f '$REMOTE_ENV_FILE' ] || { echo '缺少 .env.production'; exit 1; }
+  [ -f '$REMOTE_ENV_FILE' ] || { echo '缺少生产环境变量文件: $REMOTE_ENV_FILE'; exit 1; }
 "
 
 log_step "同步代码到 ECS"
-tar \
-  --exclude='.git' \
-  --exclude='node_modules' \
-  --exclude='.next' \
-  --exclude='.env.local' \
-  --exclude='.env.production' \
-  --exclude='deploy.env.local' \
-  --exclude='animal_describe.xlsx' \
-  --exclude='animal_img' \
-  --exclude='*.bak' \
-  --exclude='test-results' \
-  --exclude='playwright-report' \
-  --exclude='.DS_Store' \
-  -czf - \
-  -C "$PROJECT_DIR" . | ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "
+git archive --format=tar HEAD | gzip | "${SSH_CMD[@]}" "$REMOTE_TARGET" "
     mkdir -p '$REMOTE_PROJECT_DIR'
     tar -xzf - -C '$REMOTE_PROJECT_DIR'
   "
 
 log_step "远端安装、构建并发布"
-ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "
+"${SSH_CMD[@]}" "$REMOTE_TARGET" "
   set -euo pipefail
   cd '$REMOTE_PROJECT_DIR'
   mkdir -p logs uploads
@@ -136,7 +141,7 @@ ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "
 "
 
 log_step "验证部署结果"
-ssh "${SSH_OPTS[@]}" "$REMOTE_TARGET" "
+"${SSH_CMD[@]}" "$REMOTE_TARGET" "
   set -e
   curl -fsS '$HEALTHCHECK_URL'
   pm2 status '$PM2_APP_NAME'
