@@ -186,7 +186,9 @@ export default function CourseToolClient({ courseKey }: Props) {
             <BrandMark size="md" />
             <div>
               <p className="text-sm font-semibold text-[#8a6a43]">{course.stage}</p>
-              <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
+              <h1 className={`text-3xl font-bold ${courseKey === "shanhaijing" ? "font-heading tracking-normal" : "tracking-tight"}`}>
+                {course.title}
+              </h1>
               <p className="mt-1 text-lg text-stone-600">{course.subtitle}</p>
             </div>
           </div>
@@ -234,7 +236,7 @@ export default function CourseToolClient({ courseKey }: Props) {
             />
             <OptionGroup title="气质选择" options={beastMoods} value={beastMood} onChange={setBeastMood} />
             <Button
-              className="h-12 rounded-xl bg-[#27221c] text-[#f6e2b8] hover:bg-[#3b3025]"
+              className="h-12 rounded-xl border border-[#76552e] bg-[#6f4b28] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[#fff3d7] shadow-sm hover:bg-[#7d5730]"
               onClick={() => runBeastGenerate(false)}
             >
               生成神兽版画
@@ -337,15 +339,15 @@ function BeastSelector({
 
   return (
     <section>
-      <h2 className="text-lg font-bold">神兽选择</h2>
+      <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">神兽选择</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {BEAST_GROUPS.map((group) => (
           <button
             key={group.name}
             type="button"
             onClick={() => onOpenGroup(group.name)}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium ${
-              group.name === openGroup ? "border-[#8a6a43] bg-[#f4eadc] text-stone-900" : "border-stone-200 bg-white text-stone-600"
+            className={`rounded-xl border px-4 py-2 text-sm font-medium shadow-sm transition ${
+              group.name === openGroup ? "border-[#8a6a43] bg-[#efe0c8] text-[#4f341b]" : "border-[#e6d7c4] bg-white text-stone-600 hover:bg-[#fffaf2]"
             }`}
           >
             {group.name}
@@ -353,30 +355,32 @@ function BeastSelector({
         ))}
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_320px]">
+      <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {visibleBeasts.map((beast) => (
             <button
               key={beast.id}
               type="button"
               onClick={() => onSelect(beast.id)}
-              className={`overflow-hidden rounded-xl border text-left transition ${
-                beast.id === selectedId ? "border-[#8a6a43] bg-[#f4eadc] shadow-sm" : "border-stone-200 bg-white hover:border-[#d8c7ae]"
+              className={`overflow-hidden rounded-2xl border p-2 text-left transition ${
+                beast.id === selectedId
+                  ? "border-[#8a6a43] bg-[#f3e5cf] shadow-[0_10px_26px_rgba(111,75,40,0.14)]"
+                  : "border-[#e7d7c2] bg-white hover:border-[#c9ad88] hover:bg-[#fffaf2]"
               }`}
             >
-              <BeastThumbnail beast={beast} className="h-28 w-full" />
-              <div className="p-3">
-                <div className="font-semibold text-stone-900">{beast.name}</div>
+              <BeastThumbnail beast={beast} className="h-32 w-full rounded-xl" />
+              <div className="px-2 pb-2 pt-3">
+                <div className="font-heading text-lg font-bold text-[#5c3d20]">{beast.name}</div>
                 <div className="mt-1 line-clamp-2 text-xs leading-5 text-stone-500">{beast.story}</div>
               </div>
             </button>
           ))}
         </div>
 
-        <div className="rounded-xl border border-[#eadcc8] bg-[#fffaf2] p-4">
-          <BeastThumbnail beast={selectedBeast} className="h-64 w-full rounded-lg" large />
+        <div className="rounded-2xl border border-[#eadcc8] bg-[#f6ecdc] p-5 shadow-sm">
+          <BeastThumbnail beast={selectedBeast} className="h-72 w-full rounded-xl" large />
           <div className="mt-3">
-            <h3 className="text-xl font-bold text-[#8a6a43]">{selectedBeast.name}</h3>
+            <h3 className="font-heading text-3xl font-bold text-[#6f4b28]">{selectedBeast.name}</h3>
             <p className="mt-2 text-sm leading-6 text-stone-600">{selectedBeast.story}</p>
             <div className="mt-3 rounded-lg bg-white/70 p-3 text-sm leading-6 text-stone-600">
               <div><span className="font-semibold text-stone-800">外形：</span>{selectedBeast.appearance}</div>
@@ -390,15 +394,15 @@ function BeastSelector({
 
 function BeastThumbnail({ beast, className, large = false }: { beast: Beast; className?: string; large?: boolean }) {
   return (
-    <div className={`relative overflow-hidden bg-white ${className || ""}`}>
+    <div className={`relative overflow-hidden border border-[#eadcc8] bg-[#fbf3e7] ${className || ""}`}>
       <img
         src={beast.image}
         alt={`${beast.name}参考图`}
-        className={`h-full w-full ${large ? "object-contain" : "object-cover object-[50%_68%]"}`}
+        className="h-full w-full object-contain p-2"
         loading={large ? "eager" : "lazy"}
       />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/95 via-white/55 to-transparent" />
-      <div className="absolute bottom-2 right-3 rounded bg-white/80 px-2 py-1 text-sm font-bold text-[#8a6a43]">{beast.name}</div>
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fbf3e7]/95 via-[#fbf3e7]/55 to-transparent" />
+      <div className="absolute bottom-2 right-3 rounded-md bg-white/85 px-2 py-1 font-heading text-sm font-bold text-[#6f4b28]">{beast.name}</div>
     </div>
   );
 }
@@ -427,7 +431,7 @@ function RevisionPanel({
 
   return (
     <section className="rounded-xl border border-[#eadcc8] bg-white p-5">
-      <h2 className="text-xl font-bold">二次修改区</h2>
+      <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">二次修改区</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {beastEdits.map((edit) => {
           const active = selectedEdits.includes(edit);
@@ -436,8 +440,8 @@ function RevisionPanel({
               key={edit}
               type="button"
               onClick={() => applyQuickEdit(edit)}
-              className={`rounded-lg border px-4 py-2 text-sm font-medium ${
-                active ? "border-[#8a6a43] bg-[#f4eadc] text-stone-900" : "border-stone-200 bg-[#fffaf2] text-stone-600"
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                active ? "border-[#6f4b28] bg-[#ead8bc] text-[#4f341b] shadow-sm" : "border-[#e6d7c4] bg-[#fffaf2] text-stone-600 hover:border-[#c9ad88]"
               }`}
             >
               {edit}
@@ -456,7 +460,7 @@ function RevisionPanel({
         />
       </label>
       <div className="text-right text-sm text-stone-400">{notes.length}/200</div>
-      <Button className="mt-3 h-12 w-full rounded-xl bg-[#27221c] text-[#f6e2b8] hover:bg-[#3b3025]" onClick={onRegenerate}>
+      <Button className="mt-3 h-12 w-full rounded-xl border border-[#76552e] bg-[#6f4b28] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[#fff3d7] shadow-sm hover:bg-[#7d5730]" onClick={onRegenerate}>
         重新生成
       </Button>
     </section>
@@ -476,7 +480,7 @@ function BeastResultCompare({
   return (
     <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
       <CardContent className="space-y-5 p-5">
-        <h2 className="text-xl font-bold">生成结果</h2>
+        <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">生成结果</h2>
         <div className={`grid gap-4 ${revisedImage ? "lg:grid-cols-2" : ""}`}>
           {initialImage && <BeastResultImage title="初稿" image={initialImage} />}
           {revisedImage && <BeastResultImage title="修改版" image={revisedImage} />}
@@ -492,7 +496,7 @@ function BeastResultCompare({
 function BeastResultImage({ title, image }: { title: string; image: { label: string; url: string } }) {
   return (
     <div className="rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
-      <h3 className="mb-3 text-center text-xl font-bold text-[#8a6a43]">{title}</h3>
+      <h3 className="mb-3 text-center font-heading text-2xl font-bold text-[#6f4b28]">{title}</h3>
       <div className="relative overflow-hidden rounded-xl border border-stone-800 bg-[#111] p-3">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
         <div className="relative overflow-hidden rounded-lg bg-[#191510]">
@@ -503,7 +507,7 @@ function BeastResultImage({ title, image }: { title: string; image: { label: str
         href={image.url}
         target="_blank"
         rel="noreferrer"
-        className="mt-3 inline-flex rounded-lg bg-[#27221c] px-4 py-2 text-sm font-medium text-[#f6e2b8]"
+        className="mt-3 inline-flex rounded-lg bg-[#6f4b28] px-4 py-2 text-sm font-medium text-[#fff3d7]"
       >
         下载图片
       </a>
@@ -752,9 +756,17 @@ function UploadField({
           }}
         />
         {value ? (
-          <div className="w-full">
-            <img src={value} alt="上传预览" className="h-auto w-full" loading="lazy" decoding="async" />
-            <div className="bg-[#fffaf2] px-3 py-2 text-sm font-medium text-[#8a6a43]">点击或拖拽可重新选择照片</div>
+          <div className="w-full bg-[#fbf3e7]">
+            <div className="flex max-h-80 min-h-48 items-center justify-center p-3">
+              <img
+                src={value}
+                alt="上传预览"
+                className="max-h-72 w-auto max-w-full rounded-lg object-contain shadow-sm"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="border-t border-[#eadcc8] bg-[#fffaf2] px-3 py-2 text-sm font-medium text-[#8a6a43]">点击或拖拽可重新选择照片</div>
           </div>
         ) : (
           <>
