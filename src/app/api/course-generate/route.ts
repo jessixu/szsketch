@@ -50,27 +50,30 @@ export async function POST(request: NextRequest) {
   try {
     const payload = (await request.json()) as CourseGeneratePayload;
     const result = await generateCourseResult(payload);
+    const shouldRecordHistory = !(payload.courseKey === "color" && payload.action === "palette");
 
-    const history = await prisma.history.create({
-      data: {
-        userId: session.userId,
-        origin: result.origin,
-        mood: result.mood,
-        patterns: JSON.stringify(result.patterns),
-        notes: result.notes,
-        prompt: result.prompt,
-        imageUrl: result.images[0]?.url || null,
-        description: result.description,
-        aiAvailable: config.aiAvailable,
-        courseKey: payload.courseKey,
-        actionKey: payload.action,
-        paramsJson: stringifyHistoryParams(payload.inputs),
-        outputImages: JSON.stringify(result.images),
-      },
-    });
+    const history = shouldRecordHistory
+      ? await prisma.history.create({
+          data: {
+            userId: session.userId,
+            origin: result.origin,
+            mood: result.mood,
+            patterns: JSON.stringify(result.patterns),
+            notes: result.notes,
+            prompt: result.prompt,
+            imageUrl: result.images[0]?.url || null,
+            description: result.description,
+            aiAvailable: config.aiAvailable,
+            courseKey: payload.courseKey,
+            actionKey: payload.action,
+            paramsJson: stringifyHistoryParams(payload.inputs),
+            outputImages: JSON.stringify(result.images),
+          },
+        })
+      : null;
 
     return NextResponse.json({
-      id: history.id,
+      id: history?.id || null,
       courseKey: payload.courseKey,
       action: payload.action,
       images: result.images,
