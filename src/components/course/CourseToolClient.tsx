@@ -7,6 +7,7 @@ import LoadingOverlay from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api, type CourseGenerateResponse } from "@/lib/api";
+import { getCourseThemeStyle } from "@/lib/courseThemes";
 import {
   beastEdits,
   beastLibrary,
@@ -38,6 +39,7 @@ const BEAST_GROUPS = [
 export default function CourseToolClient({ courseKey }: Props) {
   const router = useRouter();
   const course = courseList.find((item) => item.key === courseKey) || courseList[1];
+  const courseThemeStyle = useMemo(() => getCourseThemeStyle(courseKey), [courseKey]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CourseGenerateResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -178,25 +180,25 @@ export default function CourseToolClient({ courseKey }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-[#fbf6ee] p-6 text-stone-900">
+    <main className="min-h-screen bg-[var(--course-page)] p-6 text-stone-900" style={courseThemeStyle}>
       {loading && <LoadingOverlay onCancel={() => setLoading(false)} />}
       <div className="mx-auto max-w-7xl space-y-5">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex gap-4">
             <BrandMark size="md" />
             <div>
-              <p className="text-sm font-semibold text-[#8a6a43]">{course.stage}</p>
-              <h1 className={`text-3xl font-bold ${courseKey === "shanhaijing" ? "font-heading tracking-normal" : "tracking-tight"}`}>
+              <p className="text-sm font-semibold text-[var(--course-primary)]">{course.stage}</p>
+              <h1 className="font-heading text-3xl font-bold tracking-normal text-[var(--course-primary-text)]">
                 {course.title}
               </h1>
               <p className="mt-1 text-lg text-stone-600">{course.subtitle}</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" className="border-stone-200 bg-[#f4eadc]" onClick={() => router.push("/")}>
+            <Button variant="outline" className="border-[var(--course-border)] bg-[var(--course-panel-soft)] text-[var(--course-primary-text)] hover:bg-[var(--course-panel-strong)]" onClick={() => router.push("/")}>
               返回课程
             </Button>
-            <Button variant="outline" className="border-stone-200 bg-[#f4eadc]" onClick={() => router.push("/history")}>
+            <Button variant="outline" className="border-[var(--course-border)] bg-[var(--course-panel-soft)] text-[var(--course-primary-text)] hover:bg-[var(--course-panel-strong)]" onClick={() => router.push("/history")}>
               生成记录
             </Button>
           </div>
@@ -204,7 +206,7 @@ export default function CourseToolClient({ courseKey }: Props) {
 
         {courseKey === "black-white" && (
           <ToolCard>
-            <div className="rounded-xl bg-[#fffaf2] p-4 text-sm leading-6 text-[#7a6040]">
+            <div className="rounded-xl bg-[var(--course-panel)] p-4 text-sm leading-6 text-[var(--course-primary-text)]">
               本工具将你拍摄的风景照片转化为版画风格的黑白稿，作为第一阶段刻制练习的参考。拿到生成结果后，请先在纸上画出你想保留、改动或添加的部分，再开始上板刻制。
             </div>
             <UploadField
@@ -219,7 +221,7 @@ export default function CourseToolClient({ courseKey }: Props) {
               value={blackWhiteStyle}
               onChange={setBlackWhiteStyle}
             />
-            <Button onClick={() => runGenerate("generate", { imageData: blackWhiteImage, styleKey: blackWhiteStyle })}>
+            <Button className="h-12 rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={() => runGenerate("generate", { imageData: blackWhiteImage, styleKey: blackWhiteStyle })}>
               生成版画稿
             </Button>
           </ToolCard>
@@ -236,7 +238,7 @@ export default function CourseToolClient({ courseKey }: Props) {
             />
             <OptionGroup title="气质选择" options={beastMoods} value={beastMood} onChange={setBeastMood} />
             <Button
-              className="h-12 rounded-xl border border-[#76552e] bg-[#6f4b28] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[#fff3d7] shadow-sm hover:bg-[#7d5730]"
+              className="h-12 rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]"
               onClick={() => runBeastGenerate(false)}
             >
               生成神兽版画
@@ -272,7 +274,7 @@ export default function CourseToolClient({ courseKey }: Props) {
             <OptionGroup title="风格选择" options={freeStyles} value={freeStyle} onChange={setFreeStyle} />
             <OptionGroup title="构图选择" options={compositions} value={composition} onChange={setComposition} />
             <OptionGroup title="元素选择" options={elements} value={element} onChange={setElement} />
-            <Button onClick={() => runGenerate("generate", { mode: freeMode, keyword: freeKeyword, imageData: freeImage, style: freeStyle, composition, element })}>
+            <Button className="h-12 rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={() => runGenerate("generate", { mode: freeMode, keyword: freeKeyword, imageData: freeImage, style: freeStyle, composition, element })}>
               生成参考图
             </Button>
           </ToolCard>
@@ -280,14 +282,14 @@ export default function CourseToolClient({ courseKey }: Props) {
 
         {courseKey === "color" && (
           <ToolCard>
-            <div className="rounded-xl bg-[#fffaf2] p-4 text-sm leading-6 text-[#7a6040]">
+            <div className="rounded-xl bg-[var(--course-panel)] p-4 text-sm leading-6 text-[var(--course-primary-text)]">
               上传你的黑白底稿，AI 将为你生成适合版画套印的配色方案与效果预览，可作为分版与印制的参考。
             </div>
             <UploadField label="上传黑白底稿" value={colorImage} onChange={setColorImage} />
             <OptionGroup title="色调选择" options={colorTones} value={tone} onChange={setTone} />
             <OptionGroup title="氛围选择" options={colorMoods} value={atmosphere} onChange={setAtmosphere} />
             <OptionGroup title="套色数量" options={colorCounts} value={colorCount} onChange={setColorCount} />
-            <Button className="h-12 rounded-xl bg-[#27221c] text-[#f6e2b8] hover:bg-[#3b3025]" onClick={() => runColorPalette(false)}>
+            <Button className="h-12 rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={() => runColorPalette(false)}>
               生成配色方案
             </Button>
             {colorPaletteResult?.palette && (
@@ -313,7 +315,7 @@ export default function CourseToolClient({ courseKey }: Props) {
 
 function ToolCard({ children }: { children: React.ReactNode }) {
   return (
-    <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
+    <Card className="border-[var(--course-border)] bg-white/90 shadow-sm">
       <CardContent className="grid gap-5 p-5">{children}</CardContent>
     </Card>
   );
@@ -339,7 +341,7 @@ function BeastSelector({
 
   return (
     <section>
-      <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">神兽选择</h2>
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">神兽选择</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {BEAST_GROUPS.map((group) => (
           <button
@@ -347,7 +349,7 @@ function BeastSelector({
             type="button"
             onClick={() => onOpenGroup(group.name)}
             className={`rounded-xl border px-4 py-2 text-sm font-medium shadow-sm transition ${
-              group.name === openGroup ? "border-[#8a6a43] bg-[#efe0c8] text-[#4f341b]" : "border-[#e6d7c4] bg-white text-stone-600 hover:bg-[#fffaf2]"
+              group.name === openGroup ? "border-[var(--course-border-strong)] bg-[var(--course-primary-soft)] text-[var(--course-primary-text)]" : "border-[var(--course-border)] bg-white text-stone-600 hover:bg-[var(--course-panel)]"
             }`}
           >
             {group.name}
@@ -364,23 +366,23 @@ function BeastSelector({
               onClick={() => onSelect(beast.id)}
               className={`overflow-hidden rounded-2xl border p-2 text-left transition ${
                 beast.id === selectedId
-                  ? "border-[#8a6a43] bg-[#f3e5cf] shadow-[0_10px_26px_rgba(111,75,40,0.14)]"
-                  : "border-[#e7d7c2] bg-white hover:border-[#c9ad88] hover:bg-[#fffaf2]"
+                  ? "border-[var(--course-border-strong)] bg-[var(--course-panel-strong)] shadow-[var(--course-shadow)]"
+                  : "border-[var(--course-border)] bg-white hover:border-[var(--course-border-strong)] hover:bg-[var(--course-panel)]"
               }`}
             >
               <BeastThumbnail beast={beast} className="h-32 w-full rounded-xl" />
               <div className="px-2 pb-2 pt-3">
-                <div className="font-heading text-lg font-bold text-[#5c3d20]">{beast.name}</div>
+                <div className="font-heading text-lg font-bold text-[var(--course-primary-text)]">{beast.name}</div>
                 <div className="mt-1 line-clamp-2 text-xs leading-5 text-stone-500">{beast.story}</div>
               </div>
             </button>
           ))}
         </div>
 
-        <div className="rounded-2xl border border-[#eadcc8] bg-[#f6ecdc] p-5 shadow-sm">
+        <div className="rounded-2xl border border-[var(--course-border)] bg-[var(--course-panel-strong)] p-5 shadow-sm">
           <BeastThumbnail beast={selectedBeast} className="h-72 w-full rounded-xl" large />
           <div className="mt-3">
-            <h3 className="font-heading text-3xl font-bold text-[#6f4b28]">{selectedBeast.name}</h3>
+            <h3 className="font-heading text-3xl font-bold text-[var(--course-primary)]">{selectedBeast.name}</h3>
             <p className="mt-2 text-sm leading-6 text-stone-600">{selectedBeast.story}</p>
             <div className="mt-3 rounded-lg bg-white/70 p-3 text-sm leading-6 text-stone-600">
               <div><span className="font-semibold text-stone-800">外形：</span>{selectedBeast.appearance}</div>
@@ -394,15 +396,15 @@ function BeastSelector({
 
 function BeastThumbnail({ beast, className, large = false }: { beast: Beast; className?: string; large?: boolean }) {
   return (
-    <div className={`relative overflow-hidden border border-[#eadcc8] bg-[#fbf3e7] ${className || ""}`}>
+    <div className={`relative overflow-hidden border border-[var(--course-border)] bg-[var(--course-panel)] ${className || ""}`}>
       <img
         src={beast.image}
         alt={`${beast.name}参考图`}
         className="h-full w-full object-contain p-2"
         loading={large ? "eager" : "lazy"}
       />
-      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#fbf3e7]/95 via-[#fbf3e7]/55 to-transparent" />
-      <div className="absolute bottom-2 right-3 rounded-md bg-white/85 px-2 py-1 font-heading text-sm font-bold text-[#6f4b28]">{beast.name}</div>
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--course-panel)] via-white/45 to-transparent" />
+      <div className="absolute bottom-2 right-3 rounded-md bg-white/85 px-2 py-1 font-heading text-sm font-bold text-[var(--course-primary)]">{beast.name}</div>
     </div>
   );
 }
@@ -430,8 +432,8 @@ function RevisionPanel({
   };
 
   return (
-    <section className="rounded-xl border border-[#eadcc8] bg-white p-5">
-      <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">二次修改区</h2>
+    <section className="rounded-xl border border-[var(--course-border)] bg-white p-5">
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">二次修改区</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {beastEdits.map((edit) => {
           const active = selectedEdits.includes(edit);
@@ -441,7 +443,7 @@ function RevisionPanel({
               type="button"
               onClick={() => applyQuickEdit(edit)}
               className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
-                active ? "border-[#6f4b28] bg-[#ead8bc] text-[#4f341b] shadow-sm" : "border-[#e6d7c4] bg-[#fffaf2] text-stone-600 hover:border-[#c9ad88]"
+                active ? "border-[var(--course-primary)] bg-[var(--course-primary-soft)] text-[var(--course-primary-text)] shadow-sm" : "border-[var(--course-border)] bg-[var(--course-panel)] text-stone-600 hover:border-[var(--course-border-strong)]"
               }`}
             >
               {edit}
@@ -456,11 +458,11 @@ function RevisionPanel({
           onChange={(event) => onNotesChange(event.target.value.slice(0, 200))}
           maxLength={200}
           placeholder="例如：让鹿角更夸张一些，背景加更多云纹，整体更有压迫感"
-          className="mt-2 h-28 w-full resize-none rounded-xl border border-stone-200 bg-[#fffaf2] p-3 text-sm outline-none focus:border-[#9c7b4f]"
+          className="mt-2 h-28 w-full resize-none rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-3 text-sm outline-none focus:border-[var(--course-border-strong)]"
         />
       </label>
       <div className="text-right text-sm text-stone-400">{notes.length}/200</div>
-      <Button className="mt-3 h-12 w-full rounded-xl border border-[#76552e] bg-[#6f4b28] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[#fff3d7] shadow-sm hover:bg-[#7d5730]" onClick={onRegenerate}>
+      <Button className="mt-3 h-12 w-full rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={onRegenerate}>
         重新生成
       </Button>
     </section>
@@ -478,14 +480,14 @@ function BeastResultCompare({
   const revisedImage = revisedResult?.images[0] || null;
 
   return (
-    <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
+    <Card className="border-[var(--course-border)] bg-white/90 shadow-sm">
       <CardContent className="space-y-5 p-5">
-        <h2 className="font-heading text-2xl font-bold text-[#6f4b28]">生成结果</h2>
+        <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">生成结果</h2>
         <div className={`grid gap-4 ${revisedImage ? "lg:grid-cols-2" : "mx-auto w-full max-w-3xl"}`}>
           {initialImage && <BeastResultImage title="初稿" image={initialImage} />}
           {revisedImage && <BeastResultImage title="修改版" image={revisedImage} />}
         </div>
-        <div className="rounded-xl border border-stone-200 bg-[#fffaf2] p-4 text-sm leading-6 text-stone-700">
+        <div className="rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-4 text-sm leading-6 text-stone-700">
           {revisedResult?.description || initialResult.description}
         </div>
       </CardContent>
@@ -495,16 +497,16 @@ function BeastResultCompare({
 
 function BeastResultImage({ title, image }: { title: string; image: { label: string; url: string } }) {
   return (
-    <div className="rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
-      <h3 className="mb-3 text-center font-heading text-2xl font-bold text-[#6f4b28]">{title}</h3>
-      <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[#f6ecdc] p-2">
+    <div className="rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-3">
+      <h3 className="mb-3 text-center font-heading text-2xl font-bold text-[var(--course-primary)]">{title}</h3>
+      <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[var(--course-panel-strong)] p-2">
         <img src={image.url} alt={title} className="max-h-[480px] w-auto max-w-full rounded-lg object-contain" />
       </div>
       <a
         href={image.url}
         target="_blank"
         rel="noreferrer"
-        className="mt-3 inline-flex rounded-lg bg-[#6f4b28] px-4 py-2 text-sm font-medium text-[#fff3d7]"
+        className="mt-3 inline-flex rounded-lg bg-[var(--course-primary)] px-4 py-2 text-sm font-medium text-[var(--course-button-text)]"
       >
         下载图片
       </a>
@@ -524,18 +526,18 @@ function ColorPalettePanel({
   onConfirm: () => void;
 }) {
   return (
-    <section className="rounded-xl border border-[#eadcc8] bg-white p-5">
+    <section className="rounded-xl border border-[var(--course-border)] bg-white p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">配色方案</h2>
+          <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">配色方案</h2>
           <p className="mt-1 text-sm text-stone-500">确认这组颜色后，再生成套色效果图。</p>
         </div>
-        <Button variant="outline" className="border-stone-200 bg-[#f4eadc]" onClick={onRefresh}>
+        <Button variant="outline" className="border-[var(--course-border)] bg-[var(--course-panel-soft)] text-[var(--course-primary-text)] hover:bg-[var(--course-panel-strong)]" onClick={onRefresh}>
           换一组
         </Button>
       </div>
       <PaletteSwatches palette={palette} count={count} className="mt-4" />
-      <Button className="mt-5 h-12 w-full rounded-xl bg-[#27221c] text-[#f6e2b8] hover:bg-[#3b3025]" onClick={onConfirm}>
+      <Button className="mt-5 h-12 w-full rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={onConfirm}>
         确认配色，生成效果图
       </Button>
     </section>
@@ -554,9 +556,9 @@ function ColorEffectPanel({
   onRegenerate: () => void;
 }) {
   return (
-    <section className="rounded-xl border border-[#eadcc8] bg-white p-5">
-      <h2 className="text-xl font-bold">套色效果图</h2>
-      <div className="mx-auto mt-4 flex max-h-[560px] max-w-4xl items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
+    <section className="rounded-xl border border-[var(--course-border)] bg-white p-5">
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">套色效果图</h2>
+      <div className="mx-auto mt-4 flex max-h-[560px] max-w-4xl items-center justify-center overflow-hidden rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-3">
         <img src={image.url} alt={image.label} className="max-h-[520px] w-auto max-w-full object-contain" />
       </div>
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
@@ -565,12 +567,12 @@ function ColorEffectPanel({
           href={image.url}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex rounded-lg bg-[#27221c] px-4 py-2 text-sm font-medium text-[#f6e2b8]"
+          className="inline-flex rounded-lg bg-[var(--course-primary)] px-4 py-2 text-sm font-medium text-[var(--course-button-text)]"
         >
           下载图片
         </a>
       </div>
-      <Button variant="outline" className="mt-5 h-11 w-full rounded-xl border-stone-200 bg-[#f4eadc]" onClick={onRegenerate}>
+      <Button variant="outline" className="mt-5 h-11 w-full rounded-xl border-[var(--course-border)] bg-[var(--course-panel-soft)] text-[var(--course-primary-text)] hover:bg-[var(--course-panel-strong)]" onClick={onRegenerate}>
         不满意，重新生成效果图
       </Button>
     </section>
@@ -592,7 +594,7 @@ function PaletteSwatches({
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
       {palette.map((color, index) => (
-        <div key={`${color}-${index}`} className={`rounded-lg border border-stone-200 bg-[#fffaf2] ${compact ? "p-2" : "p-3"}`}>
+        <div key={`${color}-${index}`} className={`rounded-lg border border-[var(--course-border)] bg-[var(--course-panel)] ${compact ? "p-2" : "p-3"}`}>
           <div className={`rounded border border-stone-200 ${compact ? "h-8 w-14" : "h-14 w-24"}`} style={{ backgroundColor: color }} />
           <div className="mt-2 text-xs font-semibold text-stone-700">{roles[index] || `颜色${index + 1}`}</div>
           <div className="mt-0.5 text-xs text-stone-500">{color}</div>
@@ -621,7 +623,7 @@ function OptionGroup({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-bold">{title}</h2>
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">{title}</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {options.map((option) => {
           const item = typeof option === "string" ? { value: option, label: option } : option;
@@ -630,8 +632,8 @@ function OptionGroup({
               key={item.value}
               type="button"
               onClick={() => onChange(item.value)}
-              className={`rounded-lg border px-4 py-2 text-left text-sm font-medium ${
-                value === item.value ? "border-[#8a6a43] bg-[#f4eadc] text-stone-900" : "border-stone-200 bg-white text-stone-600"
+              className={`rounded-xl border px-4 py-2 text-left text-sm font-medium transition ${
+                value === item.value ? "border-[var(--course-border-strong)] bg-[var(--course-primary-soft)] text-[var(--course-primary-text)] shadow-sm" : "border-[var(--course-border)] bg-white text-stone-600 hover:border-[var(--course-border-strong)] hover:bg-[var(--course-panel)]"
               }`}
             >
               <span className="block">{item.label}</span>
@@ -657,7 +659,7 @@ function CheckboxGroup({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-bold">{title}</h2>
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">{title}</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {options.map((option) => {
           const active = value.includes(option);
@@ -666,8 +668,8 @@ function CheckboxGroup({
               key={option}
               type="button"
               onClick={() => onChange(active ? value.filter((item) => item !== option) : [...value, option])}
-              className={`rounded-lg border px-4 py-2 text-sm font-medium ${
-                active ? "border-[#8a6a43] bg-[#f4eadc] text-stone-900" : "border-stone-200 bg-white text-stone-600"
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                active ? "border-[var(--course-border-strong)] bg-[var(--course-primary-soft)] text-[var(--course-primary-text)] shadow-sm" : "border-[var(--course-border)] bg-white text-stone-600 hover:border-[var(--course-border-strong)] hover:bg-[var(--course-panel)]"
               }`}
             >
               {option}
@@ -692,12 +694,12 @@ function TextField({
 }) {
   return (
     <label className="block">
-      <span className="text-lg font-bold">{label}</span>
+      <span className="font-heading text-2xl font-bold text-[var(--course-primary)]">{label}</span>
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="mt-3 h-28 w-full resize-none rounded-xl border border-stone-200 bg-[#fffaf2] p-3 outline-none focus:border-[#9c7b4f]"
+        className="mt-3 h-28 w-full resize-none rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-3 outline-none focus:border-[var(--course-border-strong)]"
       />
     </label>
   );
@@ -728,9 +730,9 @@ function UploadField({
 
   return (
     <section>
-      <h2 className="text-lg font-bold">{label}</h2>
+      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">{label}</h2>
       <label
-        className={`mt-3 flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-[#d8c7ae] bg-[#fffaf2] text-center transition hover:border-[#9c7b4f] hover:bg-[#fff7eb] ${
+        className={`mt-3 flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-[var(--course-border)] bg-[var(--course-panel)] text-center transition hover:border-[var(--course-border-strong)] hover:bg-[var(--course-panel-strong)] ${
           value ? "p-0" : "min-h-56 p-5"
         }`}
         onDragOver={(event) => {
@@ -753,7 +755,7 @@ function UploadField({
           }}
         />
         {value ? (
-          <div className="w-full bg-[#fbf3e7]">
+          <div className="w-full bg-[var(--course-panel)]">
             <div className="flex max-h-80 min-h-48 items-center justify-center p-3">
               <img
                 src={value}
@@ -763,11 +765,11 @@ function UploadField({
                 decoding="async"
               />
             </div>
-            <div className="border-t border-[#eadcc8] bg-[#fffaf2] px-3 py-2 text-sm font-medium text-[#8a6a43]">点击或拖拽可重新选择照片</div>
+            <div className="border-t border-[var(--course-border)] bg-[var(--course-panel)] px-3 py-2 text-sm font-medium text-[var(--course-primary)]">点击或拖拽可重新选择照片</div>
           </div>
         ) : (
           <>
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d8c7ae] bg-white text-3xl font-semibold text-[#8a6a43]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--course-border)] bg-white text-3xl font-semibold text-[var(--course-primary)]">
               ↑
             </div>
             <div className="mt-4 text-base font-semibold text-stone-800">拖拽照片到此处，或点击选择文件</div>
@@ -789,13 +791,13 @@ function ResultPanel({
 }) {
   const palette = result.palette || fallbackPalette;
   return (
-    <Card className="border-[#eadcc8] bg-white/90 shadow-sm">
+    <Card className="border-[var(--course-border)] bg-white/90 shadow-sm">
       <CardContent className="space-y-5 p-5">
-        <h2 className="text-xl font-bold">生成结果</h2>
+        <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">生成结果</h2>
         {palette.length > 0 && result.action === "palette" && (
           <div className="flex flex-wrap gap-3">
             {palette.map((color) => (
-              <div key={color} className="flex items-center gap-2 rounded-lg border border-stone-200 bg-[#fffaf2] p-2">
+              <div key={color} className="flex items-center gap-2 rounded-lg border border-[var(--course-border)] bg-[var(--course-panel)] p-2">
                 <span className="h-10 w-10 rounded border border-stone-200" style={{ backgroundColor: color }} />
                 <span className="text-sm font-medium text-stone-600">{color}</span>
               </div>
@@ -805,12 +807,12 @@ function ResultPanel({
         {result.images.length > 0 && (
           <div className={`grid gap-4 ${result.images.length > 1 ? "md:grid-cols-2" : "mx-auto w-full max-w-4xl"}`}>
             {result.images.map((image) => (
-              <div key={image.label} className="rounded-xl border border-stone-200 bg-[#fffaf2] p-3">
-                <h3 className={`mb-3 text-center font-bold text-[#8a6a43] ${result.courseKey === "shanhaijing" ? "text-xl" : ""}`}>
+              <div key={image.label} className="rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-3">
+                <h3 className={`mb-3 text-center font-heading font-bold text-[var(--course-primary)] ${result.courseKey === "shanhaijing" ? "text-2xl" : "text-xl"}`}>
                   {result.courseKey === "shanhaijing" ? "AI 生成版画" : image.label}
                 </h3>
                 {result.courseKey === "shanhaijing" ? (
-                  <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[#f6ecdc] p-2">
+                  <div className="flex max-h-[520px] items-center justify-center overflow-hidden rounded-xl bg-[var(--course-panel-strong)] p-2">
                     <img src={image.url} alt={image.label} className="max-h-[480px] w-auto max-w-full rounded-lg object-contain" />
                   </div>
                 ) : (
@@ -819,15 +821,15 @@ function ResultPanel({
                   </div>
                 )}
                 {result.courseKey === "black-white" && (
-                  <div className="mt-3 rounded-lg border border-[#eadcc8] bg-[#fff7eb] p-3 text-sm leading-6 text-[#6f5434]">
-                    📌 拿到这张图之后，请不要直接照着刻。试着在纸上画一版属于你的草图：哪些元素你想保留？哪里你想改动？有没有什么是你想加进去但AI没有的？这张草图就是你这件作品真正的起点。
+                  <div className="mt-3 rounded-lg border border-[var(--course-border)] bg-[var(--course-panel-strong)] p-3 text-sm leading-6 text-[var(--course-primary-text)]">
+                    拿到这张图之后，请不要直接照着刻。试着在纸上画一版属于你的草图：哪些元素你想保留？哪里你想改动？有没有什么是你想加进去但AI没有的？这张草图就是你这件作品真正的起点。
                   </div>
                 )}
                 <a
                   href={image.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 inline-flex rounded-lg bg-[#27221c] px-4 py-2 text-sm font-medium text-[#f6e2b8]"
+                  className="mt-3 inline-flex rounded-lg bg-[var(--course-primary)] px-4 py-2 text-sm font-medium text-[var(--course-button-text)]"
                 >
                   下载图片
                 </a>
@@ -835,7 +837,7 @@ function ResultPanel({
             ))}
           </div>
         )}
-        <div className="rounded-xl border border-stone-200 bg-[#fffaf2] p-4 text-sm leading-6 text-stone-700">
+        <div className="rounded-xl border border-[var(--course-border)] bg-[var(--course-panel)] p-4 text-sm leading-6 text-stone-700">
           {result.description}
         </div>
       </CardContent>

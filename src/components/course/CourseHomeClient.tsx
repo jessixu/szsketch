@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { courseList } from "@/lib/courseConfig";
+import { getCourseThemeStyle } from "@/lib/courseThemes";
 
 interface UserInfo {
   displayName: string;
@@ -45,15 +46,17 @@ export default function CourseHomeClient({ user }: { user: UserInfo }) {
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {courseList.map((course) => (
-            <Card key={course.key} className="border-[#eadcc8] bg-white/90 shadow-sm">
+            <Card
+              key={course.key}
+              className="border-[var(--course-border)] bg-white/90 shadow-sm transition hover:-translate-y-0.5 hover:shadow-[var(--course-shadow)]"
+              style={getCourseThemeStyle(course.key)}
+            >
               <CardContent className="flex min-h-64 flex-col p-5">
-                <div className="text-sm font-semibold text-[#8a6a43]">{course.stage}</div>
-                <h2 className="mt-3 text-2xl font-bold leading-tight text-stone-900">{course.title}</h2>
+                <div className="text-sm font-semibold text-[var(--course-primary)]">{course.stage}</div>
+                <h2 className="mt-3 font-heading text-2xl font-bold leading-tight text-[var(--course-primary-text)]">{course.title}</h2>
                 <p className="mt-2 text-sm text-stone-500">{course.subtitle}</p>
-                <p className="mt-5 flex-1 text-sm leading-6 text-stone-600">
-                  固定课堂提示词，学生通过点选、上传和下载完成对应阶段的版画创作辅助。
-                </p>
-                <Button className="mt-6 bg-[#27221c] text-[#f6e2b8] hover:bg-[#3b3025]" onClick={() => router.push(course.href)}>
+                <p className="mt-5 line-clamp-4 min-h-24 text-sm leading-6 text-stone-600">{course.description}</p>
+                <Button className="mt-6 bg-[var(--course-primary)] text-[var(--course-button-text)] hover:bg-[var(--course-primary-hover)]" onClick={() => router.push(course.href)}>
                   进入工具
                 </Button>
               </CardContent>

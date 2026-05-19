@@ -10,6 +10,7 @@ export const courseList: Array<{
   stage: string;
   title: string;
   subtitle: string;
+  description: string;
   href: string;
 }> = [
   {
@@ -17,6 +18,7 @@ export const courseList: Array<{
     stage: "第一阶段",
     title: "黑白版画转换器",
     subtitle: "技法奠基 · 认识黑白",
+    description: "上传一张你拍的风景照片，AI将它转化为版画风格的黑白稿。拿到结果后，先在纸上画出你想保留和改动的部分，再上板刻制。",
     href: "/courses/black-white",
   },
   {
@@ -24,6 +26,7 @@ export const courseList: Array<{
     stage: "第二阶段",
     title: "山海经神兽创作器",
     subtitle: "主题创作 · 审美养成",
+    description: "从山海经神兽图谱中选择你感兴趣的形象，结合气质关键词生成专属版画初稿。AI提供的是\"砖瓦\"，如何构筑属于你的画面，由你决定。",
     href: "/courses/shanhaijing",
   },
   {
@@ -31,6 +34,7 @@ export const courseList: Array<{
     stage: "第三阶段",
     title: "自由主题版画生成器",
     subtitle: "思维拓展 · 自主创作",
+    description: "输入你自己的主题和创意关键词，AI生成对应的版画构图参考。这一阶段没有固定答案，你的想法就是起点。",
     href: "/courses/free",
   },
   {
@@ -38,6 +42,7 @@ export const courseList: Array<{
     stage: "第四阶段",
     title: "套色版画辅助器",
     subtitle: "综合提升 · 套色创作",
+    description: "上传你的黑白底稿，AI为你生成适合版画套印的配色方案与效果预览。色彩如何叠印、层次如何分配，最终由你的刻刀来决定。",
     href: "/courses/color",
   },
 ];
