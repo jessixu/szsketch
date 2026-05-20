@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BrandMark from "@/components/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { api } from "@/lib/api";
+import { api, type PortfolioState } from "@/lib/api";
 import { courseList } from "@/lib/courseConfig";
 import { getCourseThemeStyle } from "@/lib/courseThemes";
 
@@ -12,8 +13,42 @@ interface UserInfo {
   displayName: string;
 }
 
-export default function CourseHomeClient({ user }: { user: UserInfo }) {
+export default function CourseHomeClient({
+  user,
+  initialPortfolio,
+}: {
+  user: UserInfo;
+  initialPortfolio: PortfolioState | null;
+}) {
   const router = useRouter();
+  const [portfolio, setPortfolio] = useState<PortfolioState | null>(initialPortfolio);
+  const [portfolioLoading, setPortfolioLoading] = useState(!initialPortfolio);
+  const [portfolioError, setPortfolioError] = useState("");
+
+  useEffect(() => {
+    api.portfolio()
+      .then((state) => {
+        setPortfolio(state);
+        setPortfolioError("");
+      })
+      .catch(() => {
+        setPortfolio(null);
+        setPortfolioError("暂时无法读取上传进度，可以先继续上传作品");
+      })
+      .finally(() => setPortfolioLoading(false));
+  }, []);
+
+  const openPortfolioEntry = () => {
+    router.push(portfolioEntryHref);
+  };
+
+  const nextMissingUpload = portfolio?.uploads.find((upload) => !upload.imageUrl);
+  const portfolioEntryHref = portfolio?.ready
+    ? portfolio.report?.status === "ready" ? "/portfolio/report" : "/portfolio/report/generating"
+    : `/portfolio/upload/${nextMissingUpload?.courseKey || "black-white"}`;
+  const portfolioEntryLabel = portfolio?.ready
+    ? portfolio.report?.status === "ready" ? "查看我的专属报告" : "生成我的专属报告"
+    : portfolio?.completedCount ? "继续上传作品" : "开始上传作品";
 
   const handleLogout = async () => {
     await api.logout();
@@ -62,6 +97,36 @@ export default function CourseHomeClient({ user }: { user: UserInfo }) {
               </CardContent>
             </Card>
           ))}
+        </section>
+
+        <section className="rounded-2xl border border-[#eadcc8] bg-white/90 p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="font-heading text-2xl font-bold text-[#6f4b28]">印迹留存 · 查看我的创作报告</div>
+              <p className="mt-1 text-sm text-stone-500">
+                {portfolio
+                  ? `已完成 ${portfolio.completedCount}/${portfolio.requiredCount} 件作品上传`
+                  : portfolioLoading
+                    ? "正在读取作品上传进度"
+                    : portfolioError}
+              </p>
+            </div>
+            <a
+              href={portfolioEntryHref}
+              className={`inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-medium transition ${
+                portfolio?.ready
+                  ? "bg-[#6f4b28] text-[#fff3d7] hover:bg-[#7d5730]"
+                  : "border border-[#eadcc8] bg-[#f4eadc] text-[#6f4b28] hover:bg-[#f6ecdc]"
+              }`}
+              onClick={(event) => {
+                event.preventDefault();
+                openPortfolioEntry();
+                window.location.href = portfolioEntryHref;
+              }}
+            >
+              {portfolioEntryLabel}
+            </a>
+          </div>
         </section>
 
         <footer className="text-sm text-stone-500">

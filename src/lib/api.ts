@@ -47,6 +47,21 @@ export const api = {
     ),
 
   status: () => request<{ aiAvailable: boolean; version: string }>("/api/status"),
+
+  portfolio: () => request<PortfolioState>("/api/portfolio"),
+
+  uploadPortfolioWork: (payload: { courseKey: CourseGeneratePayload["courseKey"]; imageData: string; note: string }) =>
+    request<PortfolioUploadItem>("/api/portfolio/uploads", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  generatePortfolioReport: () =>
+    request<{ report: PortfolioReportEnvelope }>("/api/portfolio/report", { method: "POST" }),
+
+  portfolioReport: () => request<{ report: PortfolioReportEnvelope | null }>("/api/portfolio/report"),
+
+  publicReport: (token: string) => request<{ report: PortfolioReportEnvelope }>(`/api/reports/${token}`),
 };
 
 export interface HistoryItem {
@@ -82,4 +97,54 @@ export interface CourseGenerateResponse {
   palette: string[] | null;
   aiAvailable: boolean;
   imageError: string | null;
+}
+
+export interface PortfolioUploadItem {
+  courseKey: CourseGeneratePayload["courseKey"];
+  stage?: string;
+  title?: string;
+  imageUrl: string | null;
+  note: string;
+  uploadedAt: string | null;
+}
+
+export interface PortfolioState {
+  uploads: PortfolioUploadItem[];
+  completedCount: number;
+  requiredCount: number;
+  ready: boolean;
+  report: null | {
+    id: string;
+    shareToken: string;
+    status: string;
+    updatedAt: string;
+  };
+}
+
+export interface PortfolioReportData {
+  studentName: string;
+  completedDate: string;
+  uploads: Required<Pick<PortfolioUploadItem, "courseKey" | "stage" | "title" | "imageUrl" | "note" | "uploadedAt">>[];
+  stageSummaries: Array<{ courseKey: string; summary: string }>;
+  stageAnalyses?: Array<{
+    courseKey: string;
+    composition: string;
+    line: string;
+    toneOrColor: string;
+    feeling: string;
+    highlight: string;
+  }>;
+  overallStyle?: string;
+  overallComment: string;
+  title: string;
+  titleReason: string;
+  closing: string;
+}
+
+export interface PortfolioReportEnvelope {
+  id: string;
+  shareToken: string;
+  status: string;
+  data: PortfolioReportData;
+  updatedAt: string;
 }

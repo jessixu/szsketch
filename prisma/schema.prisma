@@ -17,6 +17,8 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   history      History[]
+  portfolioUploads PortfolioUpload[]
+  learningReports  LearningReport[]
 
   @@map("users")
 }
@@ -43,4 +45,36 @@ model History {
   @@index([userId])
   @@index([userId, createdAt(sort: Desc)])
   @@map("history")
+}
+
+model PortfolioUpload {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  courseKey String   @map("course_key") @db.VarChar(50)
+  imageUrl  String   @map("image_url") @db.Text
+  note      String   @default("") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseKey])
+  @@index([userId])
+  @@map("portfolio_uploads")
+}
+
+model LearningReport {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  shareToken String   @unique @map("share_token") @db.VarChar(100)
+  status     String   @default("ready") @db.VarChar(30)
+  reportJson String   @map("report_json") @db.LongText
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@index([userId])
+  @@map("learning_reports")
 }

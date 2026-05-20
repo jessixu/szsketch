@@ -5,10 +5,15 @@ import { config } from "@/lib/config";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ path: string }> }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const { path: filePath } = await params;
-  const fullPath = join(config.uploadDir, filePath);
+  const { path } = await params;
+  if (!path?.length || path.some((part) => part === ".." || part.includes("\\"))) {
+    return new NextResponse("Bad request", { status: 400 });
+  }
+
+  const filePath = path.join("/");
+  const fullPath = join(config.uploadDir, ...path);
 
   try {
     const buffer = await readFile(fullPath);

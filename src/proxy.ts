@@ -21,10 +21,12 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/login") ||
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/api/health") ||
+    pathname.startsWith("/api/reports") ||
     pathname.startsWith("/api/status") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/uploads") ||
-    pathname.startsWith("/animal_img")
+    pathname.startsWith("/animal_img") ||
+    pathname.startsWith("/reports")
   ) {
     return response;
   }

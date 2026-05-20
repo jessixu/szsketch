@@ -69,6 +69,7 @@ export default function CourseToolClient({ courseKey }: Props) {
   const [colorPaletteResult, setColorPaletteResult] = useState<CourseGenerateResponse | null>(null);
   const [colorEffectResult, setColorEffectResult] = useState<CourseGenerateResponse | null>(null);
   const [paletteSeed, setPaletteSeed] = useState(0);
+  const [colorPaletteSignature, setColorPaletteSignature] = useState("");
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -79,17 +80,18 @@ export default function CourseToolClient({ courseKey }: Props) {
     () => beastLibrary.find((item) => item.id === beastId) || beastLibrary[0],
     [beastId],
   );
+  const colorSettingsSignature = useMemo(
+    () => `${colorImage}|${tone}|${atmosphere}|${colorCount}|${paletteSeed}`,
+    [atmosphere, colorCount, colorImage, paletteSeed, tone],
+  );
+  const activeColorPaletteResult = colorPaletteSignature === colorSettingsSignature ? colorPaletteResult : null;
+  const activeColorEffectResult = activeColorPaletteResult ? colorEffectResult : null;
 
   useEffect(() => {
     if (courseKey === "shanhaijing" && initialBeastResult) {
       resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }, [courseKey, initialBeastResult, revisedBeastResult]);
-
-  useEffect(() => {
-    setColorPaletteResult(null);
-    setColorEffectResult(null);
-  }, [colorImage, tone, atmosphere, colorCount]);
 
   const runGenerate = async (action: string, inputs: Record<string, unknown>) => {
     setLoading(true);
@@ -137,6 +139,7 @@ export default function CourseToolClient({ courseKey }: Props) {
     const nextSeed = refresh ? paletteSeed + 1 : paletteSeed;
     setLoading(true);
     setError(null);
+    const nextSignature = `${colorImage}|${tone}|${atmosphere}|${colorCount}|${nextSeed}`;
     try {
       const response = await api.courseGenerate({
         courseKey,
@@ -144,6 +147,7 @@ export default function CourseToolClient({ courseKey }: Props) {
         inputs: { tone, atmosphere, count: colorCount, seed: nextSeed },
       });
       setPaletteSeed(nextSeed);
+      setColorPaletteSignature(nextSignature);
       setColorPaletteResult(response);
       setColorEffectResult(null);
     } catch (err) {
@@ -158,7 +162,7 @@ export default function CourseToolClient({ courseKey }: Props) {
       setError("请先上传黑白底稿");
       return;
     }
-    const palette = colorPaletteResult?.palette;
+    const palette = activeColorPaletteResult?.palette;
     if (!palette?.length) {
       setError("请先生成并确认配色方案");
       return;
@@ -292,13 +296,13 @@ export default function CourseToolClient({ courseKey }: Props) {
             <Button className="h-12 rounded-xl border border-[var(--course-border-strong)] bg-[var(--course-primary)] bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_7px)] text-[var(--course-button-text)] shadow-sm hover:bg-[var(--course-primary-hover)]" onClick={() => runColorPalette(false)}>
               生成配色方案
             </Button>
-            {colorPaletteResult?.palette && (
-              <ColorPalettePanel palette={colorPaletteResult.palette} count={colorCount} onRefresh={() => runColorPalette(true)} onConfirm={runColorEffect} />
+            {activeColorPaletteResult?.palette && (
+              <ColorPalettePanel palette={activeColorPaletteResult.palette} count={colorCount} onRefresh={() => runColorPalette(true)} onConfirm={runColorEffect} />
             )}
-            {colorEffectResult?.images[0] && colorPaletteResult?.palette && (
-              <ColorEffectPanel image={colorEffectResult.images[0]} palette={colorPaletteResult.palette} count={colorCount} onRegenerate={runColorEffect} />
+            {activeColorEffectResult?.images[0] && activeColorPaletteResult?.palette && (
+              <ColorEffectPanel image={activeColorEffectResult.images[0]} palette={activeColorPaletteResult.palette} count={colorCount} onRegenerate={runColorEffect} />
             )}
-            {colorEffectResult?.images[0] && (
+            {activeColorEffectResult?.images[0] && (
               <footer className="text-sm text-stone-500">
                 提示：生成结果仅供学习参考，请结合课堂指导与实际印制需求进行创作。
               </footer>
@@ -308,6 +312,18 @@ export default function CourseToolClient({ courseKey }: Props) {
 
         {error && <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700">{error}</div>}
         {result && courseKey !== "shanhaijing" && courseKey !== "color" && <ResultPanel result={result} fallbackPalette={colorPalettes[tone]} />}
+        <div className="rounded-xl border border-[var(--course-border)] bg-white/80 p-4 text-sm text-stone-600">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>实体作品完成后，可以上传本阶段照片，最后生成你的学习成果报告。</span>
+            <Button
+              variant="outline"
+              className="border-[var(--course-border)] bg-[var(--course-panel-soft)] text-[var(--course-primary-text)] hover:bg-[var(--course-panel-strong)]"
+              onClick={() => router.push(`/portfolio/upload/${courseKey}`)}
+            >
+              上传本阶段作品
+            </Button>
+          </div>
+        </div>
       </div>
     </main>
   );
@@ -646,41 +662,6 @@ function OptionGroup({
   );
 }
 
-function CheckboxGroup({
-  title,
-  options,
-  value,
-  onChange,
-}: {
-  title: string;
-  options: string[];
-  value: string[];
-  onChange: (value: string[]) => void;
-}) {
-  return (
-    <section>
-      <h2 className="font-heading text-2xl font-bold text-[var(--course-primary)]">{title}</h2>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {options.map((option) => {
-          const active = value.includes(option);
-          return (
-            <button
-              key={option}
-              type="button"
-              onClick={() => onChange(active ? value.filter((item) => item !== option) : [...value, option])}
-              className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
-                active ? "border-[var(--course-border-strong)] bg-[var(--course-primary-soft)] text-[var(--course-primary-text)] shadow-sm" : "border-[var(--course-border)] bg-white text-stone-600 hover:border-[var(--course-border-strong)] hover:bg-[var(--course-panel)]"
-              }`}
-            >
-              {option}
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 function TextField({
   label,
   value,
@@ -843,10 +824,6 @@ function ResultPanel({
       </CardContent>
     </Card>
   );
-}
-
-function downloadAll(images: Array<{ label: string; url: string }>) {
-  images.forEach((image) => window.open(image.url, "_blank", "noopener,noreferrer"));
 }
 
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
